@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'lib-ngx-locale-mask',
   template: `
     <p>
-      ngx-locale-mask works!
+      Hi, Mask++
     </p>
   `,
   styles: []
