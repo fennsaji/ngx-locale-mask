@@ -48,19 +48,21 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
     const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {
       ...this._ngxLocaleMaskService.maskCategoryAndOptions
     };
-    const val: number = +value.replace(/[^0-9.]/g, '');
+    const regex = new RegExp(`${currency}` ,"g");
+    value = value.replace(regex, '');
+    const conatainsOtherChar =  /[^0-9.]/.test(value);
+    const val = +value.replace(/[^0-9. ]/g, '');
     const condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
-    console.log(condition);
     switch (this.activeMask) {
       case 'date': { break; }
       case 'currency': {
-        if (condition === currency + '∞' || condition === '∞' || (condition === this.preValue && e.keyCode !== 190))  {
+        if (condition === currency + '∞' || condition === '∞')  {
           this.valueOfTextBox = this.preValue;
-        } else {
-          if (condition !== '0' || condition !== currency + '0') {
+        } else if (conatainsOtherChar === true) {
             this.valueOfTextBox = condition;
             this.preValue = condition;
-          }
+        } else {
+
         }
         break;
       }
