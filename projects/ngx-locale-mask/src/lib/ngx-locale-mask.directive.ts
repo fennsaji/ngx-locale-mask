@@ -14,6 +14,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
   @Input()
   public set locale(value: Object) {
     this._ngxLocaleMaskService.locale = value;
+    console.log(value);
   }
 
   @Input() 
@@ -23,6 +24,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
   @Input() 
   public set currencyMask(value: CurrencyMask) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
+    console.log(value);
   }
   @Input() 
   public set numberMask(value: NumberMask) {
