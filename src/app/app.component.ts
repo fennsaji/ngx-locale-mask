@@ -14,6 +14,6 @@ export class AppComponent {
   maskOptions: CurrencyMask;
 
   constructor() {
-    this.maskOptions = { currency: 'INR', currencyCode: 'INR', digitsInfo: '3.5-8' };
+    this.maskOptions = { currency: 'INR', currencyCode: 'INR', digitsInfo: '1.0-3' };
   }
 }

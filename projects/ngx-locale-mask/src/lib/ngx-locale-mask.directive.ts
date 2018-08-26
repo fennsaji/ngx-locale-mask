@@ -22,38 +22,42 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
     registerLocaleData(this._ngxLocaleMaskService.locale);
   }
 
-  @Input() 
+  @Input()
   public set dateMask(value: DateMask) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
     this.activeMask = 'date';
   }
-  @Input() 
+  @Input()
   public set currencyMask(value: CurrencyMask) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
-    this.activeMask = 'currency'
+    this.activeMask = 'currency';
   }
-  @Input() 
+  @Input()
   public set numberMask(value: NumberMask) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
     this.activeMask = 'number';
   }
-  @Input() 
+  @Input()
   public set percentMask(value: PercentMask) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
     this.activeMask = 'percent';
   }
 
   @HostListener('keyup', ['$event.target.value', '$event'])
-  onTyping(value, e) {
-    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {...this._ngxLocaleMaskService.maskCategoryAndOptions};
-    const condition = formatCurrency(value, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
-    switch(this.activeMask) {
+  onTyping(value: string, e) {
+    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {
+      ...this._ngxLocaleMaskService.maskCategoryAndOptions
+    };
+    const val: number = +value.replace(/[^0-9.]/g, '');
+    const condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
+    console.log(condition);
+    switch (this.activeMask) {
       case 'date': { break; }
       case 'currency': {
         if (condition === currency + '∞' || condition === '∞' || (condition === this.preValue && e.keyCode !== 190))  {
           this.valueOfTextBox = this.preValue;
         } else {
-          if (condition !== '0') {
+          if (condition !== '0' || condition !== currency + '0') {
             this.valueOfTextBox = condition;
             this.preValue = condition;
           }
@@ -72,16 +76,16 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
 
   // ControlValueAccessor implementation
   writeValue(obj: any): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   registerOnChange(fn: any): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   registerOnTouched(fn: any): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   setDisabledState?(isDisabled: boolean): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
 }
