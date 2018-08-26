@@ -1,4 +1,4 @@
-import { Directive, Input, forwardRef, HostListener, HostBinding } from '@angular/core';
+import { Directive, Input, forwardRef, HostListener, HostBinding, Renderer2 } from '@angular/core';
 import { NgxLocaleMaskService } from './ngx-locale-mask.service';
 import { DateMask, CurrencyMask, NumberMask, PercentMask } from './ngx-locale-mask.modal';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
@@ -10,7 +10,8 @@ import { registerLocaleData, formatCurrency } from '@angular/common';
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => NgxLocaleMaskDirective), multi: true } ]
 })
 export class NgxLocaleMaskDirective implements ControlValueAccessor {
-  constructor(private _ngxLocaleMaskService: NgxLocaleMaskService) { }
+  constructor(private _ngxLocaleMaskService: NgxLocaleMaskService, private renderer: Renderer2) { 
+  }
 
   activeMask: string;
   preValue: string;
@@ -42,17 +43,18 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
     this.activeMask = 'percent';
   }
 
-  @HostListener('keydown', ['$event.target.value', '$event'])
+  @HostListener('keyup', ['$event.target.value', '$event'])
   onTyping(value, e) {
-    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {...value}
-    const condition = formatCurrency(value, this._ngxLocaleMaskService.locale, currency, currencyCode);
+    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {...this._ngxLocaleMaskService.maskCategoryAndOptions};
+    const condition = formatCurrency(value, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
     switch(this.activeMask) {
       case 'date': { break; }
       case 'currency': {
-        if (condition === '∞' || (condition === this.preValue && e.keyCode !== 190))  {
+        if (condition === currency + '∞' || condition === '∞' || (condition === this.preValue && e.keyCode !== 190))  {
           this.valueOfTextBox = this.preValue;
         } else {
           if (condition !== '0') {
+            this.valueOfTextBox = condition;
             this.preValue = condition;
           }
         }
@@ -63,7 +65,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
     }
   }
 
-  @HostBinding('value') valueOfTextBox;
+  @HostBinding('value') valueOfTextBox = '';
 
 
 
