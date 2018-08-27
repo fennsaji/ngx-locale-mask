@@ -1,4 +1,4 @@
-import { Directive, Input, forwardRef, HostListener, HostBinding, ElementRef, AfterViewInit } from '@angular/core';
+import { Directive, Input, forwardRef, HostListener, HostBinding, ElementRef, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { NgxLocaleMaskService } from './ngx-locale-mask.service';
 import { DateMask, CurrencyMask, NumberMask, PercentMask } from './ngx-locale-mask.modal';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
@@ -21,7 +21,9 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
 
   activeMask: string;
   elementRef: HTMLInputElement;
-  preValue: string;
+
+  @Output('localMaskChange')
+  localMaskChange: EventEmitter<number> = new EventEmitter<number>(true);
 
   @Input()
   public set locale(value: Object) {
@@ -56,15 +58,22 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {
       ...this._ngxLocaleMaskService.maskCategoryAndOptions
     };
-    // const regex = new RegExp(`${currency}` ,"g");
-    // value = value.replace(regex, '');
-    // const conatainsOtherChar =  /[^0-9.]/.test(value);
-    const val = +value.replace(/[^0-9.]/g, '');
-    const condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
+    const regex = new RegExp(`${currency}` ,"g");
+    value = value.replace(regex, '');
+    value = value.replace(/,/g, '');
+    if (/^[0-9]*\.[0-9]*$/.test(value) || /^[0-9]$/.test(value)) { return false }
+    const endsWithDot =  /^[0-9]*\.$/.test(value); // 1312312.
+    const hasComma =  /^[0-9]*,[0-9]*$/.test(value);
+    var val = +value.replace(/[^0-9.]/g, '');
+    this.localMaskChange.emit(val);
+    if (!isNaN(val)) {
+      var condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
+    }
     switch (this.activeMask) {
       case 'date': { break; }
       case 'currency': {
-        this.elementRef.value = condition;
+        if (!endsWithDot && condition!== undefined) { this.elementRef.value = condition; }
+        else if (endsWithDot) { this.elementRef.value = condition + '.' }
         break;
       }
       case 'number': { break; }

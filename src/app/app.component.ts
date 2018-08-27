@@ -13,6 +13,10 @@ export class AppComponent {
   locale = localeIn;
   maskOptions: CurrencyMask;
 
+  _val;
+  set val(val) { this._val = val; console.log(val) };
+  get val() { return this._val }
+
   constructor() {
     this.maskOptions = { currency: 'INR', currencyCode: 'INR', digitsInfo: '1.0-3' };
   }
