@@ -1,4 +1,4 @@
-import { Directive, Input, forwardRef, HostListener, HostBinding, Renderer2 } from '@angular/core';
+import { Directive, Input, forwardRef, HostListener, HostBinding, ElementRef, AfterViewInit } from '@angular/core';
 import { NgxLocaleMaskService } from './ngx-locale-mask.service';
 import { DateMask, CurrencyMask, NumberMask, PercentMask } from './ngx-locale-mask.modal';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
@@ -9,11 +9,18 @@ import { registerLocaleData, formatCurrency } from '@angular/common';
   providers: [
     { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => NgxLocaleMaskDirective), multi: true } ]
 })
-export class NgxLocaleMaskDirective implements ControlValueAccessor {
-  constructor(private _ngxLocaleMaskService: NgxLocaleMaskService, private renderer: Renderer2) { 
+export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewInit {
+
+  ngAfterViewInit(): void {
+    this.elementRef = this.el.nativeElement as HTMLInputElement;
+  }
+
+  constructor(private _ngxLocaleMaskService: NgxLocaleMaskService,
+              private el: ElementRef) { 
   }
 
   activeMask: string;
+  elementRef: HTMLInputElement;
   preValue: string;
 
   @Input()
@@ -43,35 +50,27 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
     this.activeMask = 'percent';
   }
 
-  @HostListener('keyup', ['$event.target.value', '$event'])
-  onTyping(value: string, e) {
+  @HostListener('input', ['$event'])
+  onTyping(e) {
+    let value = e.target.value;
     const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {
       ...this._ngxLocaleMaskService.maskCategoryAndOptions
     };
-    const regex = new RegExp(`${currency}` ,"g");
-    value = value.replace(regex, '');
-    const conatainsOtherChar =  /[^0-9.]/.test(value);
-    const val = +value.replace(/[^0-9. ]/g, '');
+    // const regex = new RegExp(`${currency}` ,"g");
+    // value = value.replace(regex, '');
+    // const conatainsOtherChar =  /[^0-9.]/.test(value);
+    const val = +value.replace(/[^0-9.]/g, '');
     const condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
     switch (this.activeMask) {
       case 'date': { break; }
       case 'currency': {
-        if (condition === currency + '∞' || condition === '∞')  {
-          this.valueOfTextBox = this.preValue;
-        } else if (conatainsOtherChar === true) {
-            this.valueOfTextBox = condition;
-            this.preValue = condition;
-        } else {
-
-        }
+        this.elementRef.value = condition;
         break;
       }
       case 'number': { break; }
       case 'percent': { break; }
     }
   }
-
-  @HostBinding('value') valueOfTextBox = '';
 
 
 
@@ -91,3 +90,5 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor {
   }
 
 }
+
+// ∞
