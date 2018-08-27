@@ -52,16 +52,16 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     this.activeMask = 'percent';
   }
 
-  @HostListener('input', ['$event'])
+  @HostListener('keypress', ['$event'])
   onTyping(e) {
-    let value = e.target.value;
+    let value = this.elementRef.value;
     const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {
       ...this._ngxLocaleMaskService.maskCategoryAndOptions
     };
     const regex = new RegExp(`${currency}` ,"g");
     value = value.replace(regex, '');
     value = value.replace(/,/g, '');
-    if (/^[0-9]*\.[0-9]*$/.test(value) || /^[0-9]$/.test(value)) { return false }
+    // if (/^[0-9]*\.[0-9]*$/.test(value) || /^[0-9]$/.test(value)) { return false }
     const endsWithDot =  /^[0-9]*\.$/.test(value); // 1312312.
     const hasComma =  /^[0-9]*,[0-9]*$/.test(value);
     var val = +value.replace(/[^0-9.]/g, '');
