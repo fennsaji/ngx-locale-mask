@@ -57,39 +57,35 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
   @HostListener('input', ['$event'])
   onTyping(e) {
     let value = e.target.value;
-    const { format = '', timezone = '', currency = '', currencyCode = '' } = { ...this._ngxLocaleMaskService.maskCategoryAndOptions };
-    let digitsInfo = this._ngxLocaleMaskService.maskCategoryAndOptions.digitsInfo;
+    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = { ...this._ngxLocaleMaskService.maskCategoryAndOptions };
 
-    digitsInfo = digitsInfo.substr(0, 2) + '0' + digitsInfo.substr(3);
+    var val = value.replace(/[^0-9.]/g, '');
+    let minIntegerDigits = digitsInfo.substr(0,1)
+    let maxFractionDigits = digitsInfo.substr(4)
 
-    const regex = new RegExp(`${currency}` ,"g");
-    value = value.replace(regex, '');
-    value = value.replace(/,/g, '');
-    const endsWithDot =  /^[0-9]*(\.)+$/.test(value);
-    const zerosAfterDot =  /^[0-9]*\.[0-9]*[0]+$/.test(value);
-    var val = +value.replace(/[^0-9.]/g, '');
+    let int = +val;
+    let dotExist = /\./.test(value);
 
-    if (/\./.test(value) === true) { 
-      var decInt = value.split('.'); 
-      if (decInt.length > 2) { 
-        var val = +`${decInt[0]}.${decInt[1]}`;
+    if (dotExist === true) {
+      var [intInside, dec] = val.split('.');
+      int = intInside;
+      if (/0$/.test(dec) === true && dec.length <= maxFractionDigits) { return }
+      if (dec !== '') {
+        var decCon = formatCurrency(+`0.${dec}`, this._ngxLocaleMaskService.locale, '','',`0.0-${maxFractionDigits}`);
+        decCon = decCon.substr(2);
       }
     }
+    
+    var intCon = formatCurrency(int, this._ngxLocaleMaskService.locale, currency, currencyCode, `${minIntegerDigits}.0-0`);
 
-    if(/\./.test(value) === true && decInt[1].length <= +digitsInfo.substr(4) || /\./.test(value) === false) {
-      this.localMaskChange.emit(val);
-    }
-    var condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
+    if (intCon !== undefined && decCon !== undefined) { var final = `${intCon}.${decCon}`; } 
+    if (!dotExist) { var final = `${intCon}`; }
+    if (dotExist && dec === '') { var final = `${intCon}.` }
 
     switch (this.activeMask) {
       case 'date': { break; }
       case 'currency': {
-        if (!zerosAfterDot  && !endsWithDot && condition !== undefined) { 
-          this.elementRef.value = condition; 
-        }
-        if (zerosAfterDot) {
-           this.elementRef.value = condition + '0';
-        }
+        this.elementRef.value = final;
         break;
       }
       case 'number': { break; }

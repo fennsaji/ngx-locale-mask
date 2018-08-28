@@ -18,6 +18,6 @@ export class AppComponent {
   get val() { return this._val }
 
   constructor() {
-    this.maskOptions = { currency: 'INR', currencyCode: 'INR', digitsInfo: '1.1-2' };
+    this.maskOptions = { currency: 'INR', currencyCode: 'INR', digitsInfo: '3.0-4' };
   }
 }
