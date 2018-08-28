@@ -6,15 +6,15 @@ export interface DateMask {
 export interface CurrencyMask {
     currency: string,
     currencyCode?: string,
-    digitsInfo?: string
+    digitsInfo: string
 }
 
 export interface NumberMask {
-    digitsInfo?: string;
+    digitsInfo: string;
 
 }
 
 export interface PercentMask {
-    digitsInfo?: string;
+    digitsInfo: string;
 }
 

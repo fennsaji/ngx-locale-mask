@@ -21,6 +21,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
 
   activeMask: string;
   elementRef: HTMLInputElement;
+  test;
 
   @Output('localMaskChange')
   localMaskChange: EventEmitter<number> = new EventEmitter<number>(true);
@@ -52,28 +53,40 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     this.activeMask = 'percent';
   }
 
-  @HostListener('keypress', ['$event'])
+
+  @HostListener('input', ['$event'])
   onTyping(e) {
-    let value = this.elementRef.value;
-    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = {
-      ...this._ngxLocaleMaskService.maskCategoryAndOptions
-    };
+    let value = e.target.value;
+    const { format = '', timezone = '', currency = '', currencyCode = '' } = { ...this._ngxLocaleMaskService.maskCategoryAndOptions };
+    let digitsInfo = this._ngxLocaleMaskService.maskCategoryAndOptions.digitsInfo;
+
+    digitsInfo = digitsInfo.substr(0, 2) + '0' + digitsInfo.substr(3);
+
     const regex = new RegExp(`${currency}` ,"g");
     value = value.replace(regex, '');
     value = value.replace(/,/g, '');
-    // if (/^[0-9]*\.[0-9]*$/.test(value) || /^[0-9]$/.test(value)) { return false }
-    const endsWithDot =  /^[0-9]*\.$/.test(value); // 1312312.
-    const hasComma =  /^[0-9]*,[0-9]*$/.test(value);
+    const endsWithDot =  /^[0-9]*(\.)+$/.test(value);
+    const zerosAfterDot =  /^[0-9]*\.[0]+$/.test(value);
     var val = +value.replace(/[^0-9.]/g, '');
-    this.localMaskChange.emit(val);
-    if (!isNaN(val)) {
-      var condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
+
+    if (/\./.test(value) === true) { 
+      var decInt = value.split('.'); 
+      if (decInt.length > 2) { 
+        var val = +`${decInt[0]}.${decInt[1]}`;
+      }
     }
+
+    if(/\./.test(value) === true && decInt[1].length <= +digitsInfo.substr(4) || /\./.test(value) === false) {
+      this.localMaskChange.emit(val);
+    }
+    var condition = formatCurrency(val, this._ngxLocaleMaskService.locale, currency, currencyCode, digitsInfo);
+
     switch (this.activeMask) {
       case 'date': { break; }
       case 'currency': {
-        if (!endsWithDot && condition!== undefined) { this.elementRef.value = condition; }
-        else if (endsWithDot) { this.elementRef.value = condition + '.' }
+        if (!zerosAfterDot  && !endsWithDot && condition !== undefined) { 
+          this.elementRef.value = condition; 
+        }
         break;
       }
       case 'number': { break; }

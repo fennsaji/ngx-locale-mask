@@ -7,5 +7,5 @@ export class NgxLocaleMaskService {
   constructor() { }
 
   locale: string;
-  maskCategoryAndOptions: DateMask | CurrencyMask | NumberMask | PercentMask;
+  maskCategoryAndOptions: DateMask | CurrencyMask | NumberMask | PercentMask | any;
 }
