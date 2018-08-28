@@ -66,7 +66,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     value = value.replace(regex, '');
     value = value.replace(/,/g, '');
     const endsWithDot =  /^[0-9]*(\.)+$/.test(value);
-    const zerosAfterDot =  /^[0-9]*\.[0]+$/.test(value);
+    const zerosAfterDot =  /^[0-9]*\.[0-9]*[0]+$/.test(value);
     var val = +value.replace(/[^0-9.]/g, '');
 
     if (/\./.test(value) === true) { 
@@ -86,6 +86,9 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       case 'currency': {
         if (!zerosAfterDot  && !endsWithDot && condition !== undefined) { 
           this.elementRef.value = condition; 
+        }
+        if (zerosAfterDot) {
+           this.elementRef.value = condition + '0';
         }
         break;
       }
