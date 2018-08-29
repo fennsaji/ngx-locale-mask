@@ -23,11 +23,17 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
   elementRef: HTMLInputElement;
   test;
 
+  digSep;
+  decSep;
+
   @Output('localMaskChange')
   localMaskChange: EventEmitter<number> = new EventEmitter<number>(true);
 
   @Input()
   public set locale(value: Object) {
+    this.decSep = value[13][0];
+    this.digSep = value[13][1];
+    debugger
     this._ngxLocaleMaskService.locale = value.toString();
     registerLocaleData(this._ngxLocaleMaskService.locale);
   }
@@ -59,15 +65,21 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     let value = e.target.value;
     const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = { ...this._ngxLocaleMaskService.maskCategoryAndOptions };
 
-    var val = value.replace(/[^0-9.]/g, ''); // Remove anything other than numbers or dots.
+    const decSepRegex = new RegExp(`[^0-9${this.decSep}]`, "g");
+    var val = value.replace(decSepRegex, ''); // Removes anything other than decSep
     let minIntegerDigits = digitsInfo.substr(0,1); // 'i.d-l' -> i
     let maxFractionDigits = digitsInfo.substr(4); // 'i.d-l' => l
 
     let int = +val; // converting to number
-    let dotExist = /\./.test(value); // existence of atleast one dot
+    if (this.decSep !== '.') {
+      var dotExistRegex = new RegExp(`${this.decSep}`, "g");
+    } else {
+      var dotExistRegex = new RegExp(`\\${this.decSep}`, "g");
+    }
+    let dotExist = dotExistRegex.test(value); // existence of atleast one degSep
 
     if (dotExist === true) {
-      var [intInside, dec] = val.split('.'); // splitting into two at first dot
+      var [intInside, dec] = val.split(this.decSep); // splitting into two at first dot
       int = intInside;
       if (/0$/.test(dec) === true && dec.length <= maxFractionDigits) { return } // if dec part ends with 0 exit this scope
       if (dec !== '' || dec.length > maxFractionDigits) { // if dec exist or maxFractionDigits > length of dec part
@@ -90,7 +102,8 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       case 'date': { break; }
       case 'currency': {
         this.elementRef.value = final;
-        final = final.replace(/[^0-9.]/g, '');
+        final = final.replace(/[^0-9]/g, '');
+        final = final.replace(decSepRegex, '');
         this.localMaskChange.emit(+final);
         break;
       }
