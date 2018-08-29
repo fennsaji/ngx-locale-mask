@@ -90,6 +90,8 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       case 'date': { break; }
       case 'currency': {
         this.elementRef.value = final;
+        final = final.replace(/[^0-9.]/g, '');
+        this.localMaskChange.emit(+final);
         break;
       }
       case 'number': { break; }
