@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import locale from '@angular/common/locales/en-DE';
+import localeIN from '@angular/common/locales/en-IN';
+
 import { CurrencyMask } from 'ngx-locale-mask';
+import { registerLocaleData, formatCurrency } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +21,9 @@ export class AppComponent {
   get val() { return this._val }
 
   constructor() {
-    this.maskOptions = { currency: 'EUR', currencyCode: 'EUR', digitsInfo: '3.0-4' };
+    registerLocaleData(locale)
+    this.maskOptions = { localeName: 'en-DE', currency: 'EUR', currencyCode: 'EUR', digitsInfo: '3.0-4' };
+    document.write(formatCurrency(1233.545, 'en-IN', 'EUR','EUR',''))
+
   }
 }

@@ -25,6 +25,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
 
   digSep;
   decSep;
+  leftPos;
 
   @Output('localMaskChange')
   localMaskChange: EventEmitter<number> = new EventEmitter<number>(true);
@@ -34,7 +35,8 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     console.log(value);
     this.decSep = value[13][0];
     this.digSep = value[13][1];
-    debugger
+    this.leftPos = value[14][2][0] === '¤' ? true : false;
+
     this._ngxLocaleMaskService.locale = value.toString();
     registerLocaleData(this._ngxLocaleMaskService.locale);
   }
@@ -64,14 +66,14 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
   @HostListener('input', ['$event'])
   onTyping(e) {
     let value = e.target.value;
-    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = { ...this._ngxLocaleMaskService.maskCategoryAndOptions };
+    const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '', localeName = '' } = { ...this._ngxLocaleMaskService.maskCategoryAndOptions };
 
     const decSepRegex = new RegExp(`[^0-9${this.decSep}]`, "g");
     var val = value.replace(decSepRegex, ''); // Removes anything other than decSep
     let minIntegerDigits = digitsInfo.substr(0,1); // 'i.d-l' -> i
     let maxFractionDigits = digitsInfo.substr(4); // 'i.d-l' => l
-
-    let int = +val; // converting to number
+    let int = +val.replace(this.decSep,".");
+    // let int = +val; // converting to number
     if (this.decSep !== '.') {
       var dotExistRegex = new RegExp(`${this.decSep}`, "g");
     } else {
@@ -87,17 +89,27 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
         if (dec.length > maxFractionDigits) { 
             decCon = dec.substr(0, maxFractionDigits); // stake the first maxFractionDigits to decCon
          } else { 
-            var decCon = formatCurrency(+`0.${dec}`, this._ngxLocaleMaskService.locale, '','',`0.0-${maxFractionDigits}`);
+            var decCon = formatCurrency(+`0.${dec}`, localeName, '','',`0.0-${maxFractionDigits}`);
             decCon = decCon.substr(2); //  Eg: '0.12234...' = > '12234...'
          }
       }
     }
     
-    var intCon = formatCurrency(int, this._ngxLocaleMaskService.locale, currency, currencyCode, `${minIntegerDigits}.0-0`);
+    var intCon = formatCurrency(int, localeName, currency, currencyCode, `${minIntegerDigits}.0-0`);
 
-    if (intCon !== undefined && decCon !== undefined) { var final = `${intCon}${this.decSep}${decCon}`; } 
+    if (intCon !== undefined && decCon !== undefined) { 
+      if(this.leftPos) {
+        var final = `${intCon}${this.decSep}${decCon}`; 
+      } else {
+        // 154EUR
+        var digPart = intCon.replace(/[^0-9]/, '');
+        var curPart = intCon.replace(/[0-9]/, '');
+        var final = `${digPart}${this.decSep}${decCon}${curPart}`;
+      }
+    } 
     if (!dotExist) { var final = `${intCon}`; }
     if (dotExist && dec === '') { var final = `${intCon}${this.decSep}` }
+    // ¤
 
     switch (this.activeMask) {
       case 'date': { break; }

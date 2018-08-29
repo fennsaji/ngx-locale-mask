@@ -6,7 +6,8 @@ export interface DateMask {
 export interface CurrencyMask {
     currency: string,
     currencyCode?: string,
-    digitsInfo: string
+    digitsInfo: string,
+    localeName: string
 }
 
 export interface NumberMask {
