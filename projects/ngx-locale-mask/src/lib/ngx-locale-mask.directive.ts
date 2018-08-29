@@ -59,20 +59,24 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     let value = e.target.value;
     const { format = '', timezone = '', currency = '', currencyCode = '', digitsInfo = '' } = { ...this._ngxLocaleMaskService.maskCategoryAndOptions };
 
-    var val = value.replace(/[^0-9.]/g, '');
-    let minIntegerDigits = digitsInfo.substr(0,1)
-    let maxFractionDigits = digitsInfo.substr(4)
+    var val = value.replace(/[^0-9.]/g, ''); // Remove anything other than numbers or dots.
+    let minIntegerDigits = digitsInfo.substr(0,1); // 'i.d-l' -> i
+    let maxFractionDigits = digitsInfo.substr(4); // 'i.d-l' => l
 
-    let int = +val;
-    let dotExist = /\./.test(value);
+    let int = +val; // converting to number
+    let dotExist = /\./.test(value); // existence of atleast one dot
 
     if (dotExist === true) {
-      var [intInside, dec] = val.split('.');
+      var [intInside, dec] = val.split('.'); // splitting into two at first dot
       int = intInside;
-      if (/0$/.test(dec) === true && dec.length <= maxFractionDigits) { return }
-      if (dec !== '') {
-        var decCon = formatCurrency(+`0.${dec}`, this._ngxLocaleMaskService.locale, '','',`0.0-${maxFractionDigits}`);
-        decCon = decCon.substr(2);
+      if (/0$/.test(dec) === true && dec.length <= maxFractionDigits) { return } // if dec part ends with 0 exit this scope
+      if (dec !== '' || dec.length > maxFractionDigits) { // if dec exist or maxFractionDigits > length of dec part
+        if (dec.length > maxFractionDigits) { 
+            decCon = dec.substr(0, maxFractionDigits); // stake the first maxFractionDigits to decCon
+         } else { 
+            var decCon = formatCurrency(+`0.${dec}`, this._ngxLocaleMaskService.locale, '','',`0.0-${maxFractionDigits}`);
+            decCon = decCon.substr(2); //  Eg: '0.12234...' = > '12234...'
+         }
       }
     }
     
