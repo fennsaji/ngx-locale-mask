@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import locale from '@angular/common/locales/en-IN';
+import locale from '@angular/common/locales/en-DE';
 import { CurrencyMask } from 'ngx-locale-mask';
 
 @Component({
@@ -18,6 +18,6 @@ export class AppComponent {
   get val() { return this._val }
 
   constructor() {
-    this.maskOptions = { currency: 'INR', currencyCode: 'INR', digitsInfo: '3.0-4' };
+    this.maskOptions = { currency: 'EUR', currencyCode: 'EUR', digitsInfo: '3.0-4' };
   }
 }

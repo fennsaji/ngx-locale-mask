@@ -31,6 +31,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
 
   @Input()
   public set locale(value: Object) {
+    console.log(value);
     this.decSep = value[13][0];
     this.digSep = value[13][1];
     debugger
@@ -94,15 +95,14 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     
     var intCon = formatCurrency(int, this._ngxLocaleMaskService.locale, currency, currencyCode, `${minIntegerDigits}.0-0`);
 
-    if (intCon !== undefined && decCon !== undefined) { var final = `${intCon}.${decCon}`; } 
+    if (intCon !== undefined && decCon !== undefined) { var final = `${intCon}${this.decSep}${decCon}`; } 
     if (!dotExist) { var final = `${intCon}`; }
-    if (dotExist && dec === '') { var final = `${intCon}.` }
+    if (dotExist && dec === '') { var final = `${intCon}${this.decSep}` }
 
     switch (this.activeMask) {
       case 'date': { break; }
       case 'currency': {
         this.elementRef.value = final;
-        final = final.replace(/[^0-9]/g, '');
         final = final.replace(decSepRegex, '');
         this.localMaskChange.emit(+final);
         break;
