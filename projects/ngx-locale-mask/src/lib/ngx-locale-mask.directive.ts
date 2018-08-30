@@ -143,5 +143,6 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
   }
 
 }
-
+// Next - remove alpha after 0
+// Next - left and right pos currency code
 // ∞
