@@ -97,15 +97,16 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     
     var intCon = formatCurrency(int, localeName, currency, currencyCode, `${minIntegerDigits}.0-0`);
 
-    if (intCon !== undefined && decCon !== undefined) {
+    if (intCon !== undefined || decCon !== undefined) {
       if(this.leftPos) {
         var final = `${intCon}${this.decSep}${decCon}`; 
       } else {
         // 154EUR
-        var digPart = intCon.replace(/[^0-9]/, '');
-        var curPart = intCon.replace(/[0-9]/, '');
+        const decSepRegex = new RegExp(`[^0-9${this.digSep}]`, "g");
+        var digPart = intCon.replace(decSepRegex, '');
+        var curPart = intCon.replace(/[0-9]/g, '');
         var final = `${digPart}${this.decSep}${decCon}${curPart}`;
-        var finalLength = final.length;
+        var finalLength = final.length - curPart.length;
         console.log('final length' + finalLength)
       }
     } 
@@ -113,7 +114,16 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       var final = `${intCon}`;
       var finalLength = final.length;
     }
-    if (dotExist && dec === '') { var final = `${intCon}${this.decSep}` }
+    if (dotExist && dec === '') {
+      if (this.leftPos) {
+        var final = `${intCon}${this.decSep}` 
+      } else {
+        const decSepRegex = new RegExp(`[^0-9${this.digSep}]`, "g");
+        var digPart = intCon.replace(decSepRegex, '');
+        var curPart = intCon.replace(/[0-9]/g, '');
+        var final = `${digPart}${this.decSep}${curPart}`
+      }
+    }
     // ¤
 
     switch (this.activeMask) {
