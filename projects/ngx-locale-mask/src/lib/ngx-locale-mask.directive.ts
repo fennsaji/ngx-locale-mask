@@ -97,7 +97,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     
     var intCon = formatCurrency(int, localeName, currency, currencyCode, `${minIntegerDigits}.0-0`);
 
-    if (intCon !== undefined && decCon !== undefined) { 
+    if (intCon !== undefined && decCon !== undefined) {
       if(this.leftPos) {
         var final = `${intCon}${this.decSep}${decCon}`; 
       } else {
@@ -105,9 +105,14 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
         var digPart = intCon.replace(/[^0-9]/, '');
         var curPart = intCon.replace(/[0-9]/, '');
         var final = `${digPart}${this.decSep}${decCon}${curPart}`;
+        var finalLength = final.length;
+        console.log('final length' + finalLength)
       }
     } 
-    if (!dotExist) { var final = `${intCon}`; }
+    if (!dotExist) { 
+      var final = `${intCon}`;
+      var finalLength = final.length;
+    }
     if (dotExist && dec === '') { var final = `${intCon}${this.decSep}` }
     // ¤
 
@@ -115,6 +120,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       case 'date': { break; }
       case 'currency': {
         this.elementRef.value = final;
+        if (finalLength !== undefined) { setTimeout(() => { this.elementRef.setSelectionRange(finalLength-4, finalLength-4); }, 0) }
         final = final.replace(decSepRegex, '');
         this.localMaskChange.emit(+final);
         break;
