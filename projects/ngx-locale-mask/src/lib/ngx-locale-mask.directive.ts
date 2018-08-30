@@ -70,6 +70,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
 
     const decSepRegex = new RegExp(`[^0-9${this.decSep}]`, "g");
     var val = value.replace(decSepRegex, ''); // Removes anything other than decSep
+    debugger
     let minIntegerDigits = digitsInfo.substr(0,1); // 'i.d-l' -> i
     let maxFractionDigits = digitsInfo.substr(4); // 'i.d-l' => l
     let int = +val.replace(this.decSep,".");
@@ -80,7 +81,7 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       var dotExistRegex = new RegExp(`\\${this.decSep}`, "g");
     }
     let dotExist = dotExistRegex.test(value); // existence of atleast one degSep
-
+  
     if (dotExist === true) {
       var [intInside, dec] = val.split(this.decSep); // splitting into two at first dot
       int = intInside;
@@ -90,25 +91,22 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
             decCon = dec.substr(0, maxFractionDigits); // stake the first maxFractionDigits to decCon
          } else { 
             var decCon = formatCurrency(+`0.${dec}`, localeName, '','',`0.0-${maxFractionDigits}`);
-            decCon = decCon.substr(2); //  Eg: '0.12234...' = > '12234...'
+            [, decCon] = decCon.split(this.decSep); //  Eg: '0.12234...' = > '12234...'
          }
       }
     }
     
     var intCon = formatCurrency(int, localeName, currency, currencyCode, `${minIntegerDigits}.0-0`);
 
-    if (intCon !== undefined || decCon !== undefined) {
-      if(this.leftPos) {
+    if (intCon !== undefined && decCon !== undefined) { 
+      // if(this.leftPos) {
         var final = `${intCon}${this.decSep}${decCon}`; 
-      } else {
-        // 154EUR
-        const decSepRegex = new RegExp(`[^0-9${this.digSep}]`, "g");
-        var digPart = intCon.replace(decSepRegex, '');
-        var curPart = intCon.replace(/[0-9]/g, '');
-        var final = `${digPart}${this.decSep}${decCon}${curPart}`;
-        var finalLength = final.length - curPart.length;
-        console.log('final length' + finalLength)
-      }
+      // } else {
+      //   // 154EUR
+      //   var digPart = intCon.replace(/[^0-9]/g, '');
+      //   var curPart = intCon.replace(/[0-9]/g, '');
+      //   var final = `${digPart}${this.decSep}${decCon}${curPart}`;
+      // }
     } 
     if (!dotExist) { 
       var final = `${intCon}`;
@@ -158,5 +156,6 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
   }
 
 }
-
+// Next - remove alpha after 0
+// Next - left and right pos currency code
 // ∞
