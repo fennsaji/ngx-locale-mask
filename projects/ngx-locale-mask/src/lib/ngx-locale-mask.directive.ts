@@ -96,11 +96,15 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       }
     }
     
-    var intCon = formatCurrency(int, localeName, currency, currencyCode, `${minIntegerDigits}.0-0`);
+    var intCon = formatCurrency(int, localeName, '', currencyCode, `${minIntegerDigits}.0-0`);
 
+    var final = '';
+    if(this.leftPos) {
+      final+=currency;
+    }
     if (intCon !== undefined && decCon !== undefined) { 
       // if(this.leftPos) {
-        var final = `${intCon}${this.decSep}${decCon}`; 
+        final += `${intCon}${this.decSep}${decCon}`; 
       // } else {
       //   // 154EUR
       //   var digPart = intCon.replace(/[^0-9]/g, '');
@@ -108,8 +112,11 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       //   var final = `${digPart}${this.decSep}${decCon}${curPart}`;
       // }
     } 
-    if (!dotExist) { var final = `${intCon}`; }
-    if (dotExist && dec === '') { var final = `${intCon}${this.decSep}` }
+    if (!dotExist) { final += `${intCon}`; }
+    if (dotExist && dec === '') { final += `${intCon}${this.decSep}` }
+    if(!this.leftPos) {
+      final+=currency;
+    }
     // ¤
 
     switch (this.activeMask) {
