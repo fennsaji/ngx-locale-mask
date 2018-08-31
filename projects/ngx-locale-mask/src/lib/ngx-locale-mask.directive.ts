@@ -92,35 +92,29 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
          } else { 
             var decCon = formatCurrency(+`0.${dec}`, localeName, '','',`0.0-${maxFractionDigits}`);
             [, decCon] = decCon.split(this.decSep); //  Eg: '0.12234...' = > '12234...'
+            decCon = decCon.trim();
          }
       }
     }
     
     var intCon = formatCurrency(int, localeName, currency, currencyCode, `${minIntegerDigits}.0-0`);
+    var currencyReq = intCon.replace(new RegExp(`[0-9${this.digSep}]`, 'g'), '')
+    intCon = intCon.replace(new RegExp(`[^0-9${this.digSep}]`, 'g'), '')
 
-    if (intCon !== undefined && decCon !== undefined) { 
-      // if(this.leftPos) {
-        var final = `${intCon}${this.decSep}${decCon}`; 
-      // } else {
-      //   // 154EUR
-      //   var digPart = intCon.replace(/[^0-9]/g, '');
-      //   var curPart = intCon.replace(/[0-9]/g, '');
-      //   var final = `${digPart}${this.decSep}${decCon}${curPart}`;
-      // }
-    } 
-    if (!dotExist) { 
-      var final = `${intCon}`;
-      var finalLength = final.length;
+    var final = '';
+    if(this.leftPos) {
+      final+=currencyReq;
     }
-    if (dotExist && dec === '') {
-      if (this.leftPos) {
-        var final = `${intCon}${this.decSep}` 
-      } else {
-        const decSepRegex = new RegExp(`[^0-9${this.digSep}]`, "g");
-        var digPart = intCon.replace(decSepRegex, '');
-        var curPart = intCon.replace(/[0-9]/g, '');
-        var final = `${digPart}${this.decSep}${curPart}`
-      }
+    if (intCon !== undefined && decCon !== undefined) { 
+      final += `${intCon}${this.decSep}${decCon}`; 
+    } 
+    if (!dotExist) { final += `${intCon}`; }
+    if (dotExist && dec === '') { final += `${intCon}${this.decSep}` }
+
+    var finalLength;
+    if(!this.leftPos) {
+      final+=currencyReq;
+      finalLength = final.length;
     }
     // ¤
 
@@ -128,8 +122,9 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       case 'date': { break; }
       case 'currency': {
         this.elementRef.value = final;
-        if (finalLength !== undefined) { setTimeout(() => { this.elementRef.setSelectionRange(finalLength-4, finalLength-4); }, 0) }
-        final = final.replace(decSepRegex, '');
+        if (finalLength !== undefined) { setTimeout(() => { 
+          this.elementRef.setSelectionRange(finalLength-currency.length-1, finalLength-currency.length-1); 
+        }, 0) }
         this.localMaskChange.emit(+final);
         break;
       }
