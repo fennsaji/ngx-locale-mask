@@ -92,30 +92,29 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
          } else { 
             var decCon = formatCurrency(+`0.${dec}`, localeName, '','',`0.0-${maxFractionDigits}`);
             [, decCon] = decCon.split(this.decSep); //  Eg: '0.12234...' = > '12234...'
+            decCon = decCon.trim();
          }
       }
     }
     
-    var intCon = formatCurrency(int, localeName, '', currencyCode, `${minIntegerDigits}.0-0`);
+    var intCon = formatCurrency(int, localeName, currency, currencyCode, `${minIntegerDigits}.0-0`);
+    var currencyReq = intCon.replace(new RegExp(`[0-9${this.digSep}]`, 'g'), '')
+    intCon = intCon.replace(new RegExp(`[^0-9${this.digSep}]`, 'g'), '')
 
     var final = '';
     if(this.leftPos) {
-      final+=currency;
+      final+=currencyReq;
     }
     if (intCon !== undefined && decCon !== undefined) { 
-      // if(this.leftPos) {
-        final += `${intCon}${this.decSep}${decCon}`; 
-      // } else {
-      //   // 154EUR
-      //   var digPart = intCon.replace(/[^0-9]/g, '');
-      //   var curPart = intCon.replace(/[0-9]/g, '');
-      //   var final = `${digPart}${this.decSep}${decCon}${curPart}`;
-      // }
+      final += `${intCon}${this.decSep}${decCon}`; 
     } 
     if (!dotExist) { final += `${intCon}`; }
     if (dotExist && dec === '') { final += `${intCon}${this.decSep}` }
+
+    var finalLength;
     if(!this.leftPos) {
-      final+=currency;
+      final+=currencyReq;
+      finalLength = final.length;
     }
     // ¤
 
@@ -124,6 +123,9 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       case 'currency': {
         this.elementRef.value = final;
         final = final.replace(decSepRegex, '');
+        if (finalLength !== undefined) { setTimeout(() => { 
+          this.elementRef.setSelectionRange(finalLength-currency.length-1, finalLength-currency.length-1); 
+        }, 0) }
         this.localMaskChange.emit(+final);
         break;
       }

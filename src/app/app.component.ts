@@ -22,7 +22,7 @@ export class AppComponent {
 
   constructor() {
     registerLocaleData(locale)
-    this.maskOptions = { localeName: 'en-DE', currency: 'EUR', currencyCode: 'EUR', digitsInfo: '3.0-4' };
+    this.maskOptions = { localeName: 'en-DE', currency: '₹', currencyCode: '$', digitsInfo: '3.0-4' };
     document.write(formatCurrency(1233.545, 'en-IN', 'EUR','EUR',''))
 
   }
