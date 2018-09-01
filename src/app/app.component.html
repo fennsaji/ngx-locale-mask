@@ -1,1 +1,4 @@
-<input  type="text" (localMaskChange)="val=$event" localeMask [locale]="locale" [currencyMask]="maskOptions">
+<input  type="text" (localMaskChange)="val=$event" localeMask [(locale)]="locale" [currencyMask]="maskOptions"><br>
+<div *ngFor="let locale of localeArr; let i = index">
+    <input type="radio" name="locale" [value]="locale" (change)="changeLocale(locale)" [checked]="i == 0"> {{locale}}<br>
+</div>
