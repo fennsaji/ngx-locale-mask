@@ -3,7 +3,7 @@ import localeEU from '@angular/common/locales/en-DE';
 import localeIN from '@angular/common/locales/en-IN';
 import localeAU from '@angular/common/locales/en-AU';
 
-import { CurrencyMask } from 'ngx-locale-mask';
+import { CurrencyOptions } from 'ngx-locale-mask';
 import { registerLocaleData, formatCurrency } from '@angular/common';
 
 @Component({
@@ -15,7 +15,7 @@ import { registerLocaleData, formatCurrency } from '@angular/common';
 export class AppComponent {
   title = 'ngx-locale-mask-app';
   locale = localeIN;
-  maskOptions: CurrencyMask;
+  maskOptions: CurrencyOptions;
   localeArr = ['en-IN', 'en-DE', 'en-AU'];
 
   _val;

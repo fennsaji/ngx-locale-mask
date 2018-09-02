@@ -3,7 +3,7 @@ export interface DateMask {
     timezone?: string
 
 }
-export interface CurrencyMask {
+export interface CurrencyOptions {
     currency: string,
     currencyCode?: string,
     digitsInfo: string,

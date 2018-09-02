@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
-import { NgxLocaleMaskDirective } from './ngx-locale-mask.directive';
+import { NgxLocaleCurrencyMaskDirective } from './ngx-locale-currency-mask.directive';
 import { NgxLocaleMaskService } from './ngx-locale-mask.service';
 
 
 @NgModule({
   imports: [
   ],
-  declarations: [NgxLocaleMaskDirective],
-  exports: [NgxLocaleMaskDirective],
+  declarations: [NgxLocaleCurrencyMaskDirective],
+  exports: [NgxLocaleCurrencyMaskDirective],
   providers: [NgxLocaleMaskService]
 })
 export class NgxLocaleMaskModule { }

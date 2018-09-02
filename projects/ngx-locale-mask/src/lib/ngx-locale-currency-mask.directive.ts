@@ -1,15 +1,13 @@
 import { Directive, Input, forwardRef, HostListener, HostBinding, ElementRef, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { NgxLocaleMaskService } from './ngx-locale-mask.service';
-import { DateMask, CurrencyMask, NumberMask, PercentMask } from './ngx-locale-mask.modal';
+import { DateMask, CurrencyOptions, NumberMask, PercentMask } from './ngx-locale-mask.modal';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { registerLocaleData, formatCurrency } from '@angular/common';
 
 @Directive({
-  selector: 'input[type=text][localeMask]',
-  providers: [
-    { provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => NgxLocaleMaskDirective), multi: true } ]
-})
-export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewInit {
+  selector: 'input[type=text][localeCurrencyMask]'
+  })
+export class NgxLocaleCurrencyMaskDirective implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.elementRef = this.el.nativeElement as HTMLInputElement;
@@ -27,8 +25,8 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
   decSep;
   leftPos;
 
-  @Output('localMaskChange')
-  localMaskChange: EventEmitter<number> = new EventEmitter<number>(true);
+  @Output('localCurrencyMaskChange')
+  localCurrencyMaskChange: EventEmitter<number> = new EventEmitter<number>(true);
 
   @Input()
   public set locale(value: Object) {
@@ -46,16 +44,19 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
     this.activeMask = 'date';
   }
+
   @Input()
-  public set currencyMask(value: CurrencyMask) {
+  public set currencyOptions(value: CurrencyOptions) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
     this.activeMask = 'currency';
   }
+
   @Input()
   public set numberMask(value: NumberMask) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
     this.activeMask = 'number';
   }
+  
   @Input()
   public set percentMask(value: PercentMask) {
     this._ngxLocaleMaskService.maskCategoryAndOptions = value;
@@ -70,11 +71,11 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
 
     const decSepRegex = new RegExp(`[^0-9${this.decSep}]`, "g");
     var val = value.replace(decSepRegex, ''); // Removes anything other than decSep
-    debugger
+
     let minIntegerDigits = digitsInfo.substr(0,1); // 'i.d-l' -> i
     let maxFractionDigits = digitsInfo.substr(4); // 'i.d-l' => l
     let int = +val.replace(this.decSep,".");
-    // let int = +val; // converting to number
+
     if (this.decSep !== '.') {
       var dotExistRegex = new RegExp(`${this.decSep}`, "g");
     } else {
@@ -85,7 +86,9 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     if (dotExist === true) {
       var [intInside, dec] = val.split(this.decSep); // splitting into two at first dot
       int = intInside;
+
       if (/0$/.test(dec) === true && dec.length <= maxFractionDigits) { return } // if dec part ends with 0 exit this scope
+      
       if (dec !== '' || dec.length > maxFractionDigits) { // if dec exist or maxFractionDigits > length of dec part
         if (dec.length > maxFractionDigits) { 
             decCon = dec.substr(0, maxFractionDigits); // stake the first maxFractionDigits to decCon
@@ -102,13 +105,14 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
     intCon = intCon.replace(new RegExp(`[^0-9${this.digSep}]`, 'g'), '')
 
     var final = '';
-    if(this.leftPos) {
-      final+=currencyReq;
-    }
+    if(this.leftPos) { final+=currencyReq; }
+
     if (intCon !== undefined && decCon !== undefined) { 
       final += `${intCon}${this.decSep}${decCon}`; 
     } 
+
     if (!dotExist) { final += `${intCon}`; }
+
     if (dotExist && dec === '') { final += `${intCon}${this.decSep}` }
 
     var finalLength;
@@ -123,33 +127,15 @@ export class NgxLocaleMaskDirective implements ControlValueAccessor, AfterViewIn
       case 'currency': {
         this.elementRef.value = final;
         if (finalLength !== undefined) { setTimeout(() => { 
-          this.elementRef.setSelectionRange(finalLength-currency.length-1, finalLength-currency.length-1); 
+          this.elementRef.setSelectionRange(finalLength-currencyReq.length, finalLength-currencyReq.length); 
         }, 0) }
-        this.localMaskChange.emit(+final);
+        this.localCurrencyMaskChange.emit(+final);
         break;
       }
       case 'number': { break; }
       case 'percent': { break; }
     }
   }
-
-
-
-
-  // ControlValueAccessor implementation
-  writeValue(obj: any): void {
-    throw new Error('Method not implemented.');
-  }
-  registerOnChange(fn: any): void {
-    throw new Error('Method not implemented.');
-  }
-  registerOnTouched(fn: any): void {
-    throw new Error('Method not implemented.');
-  }
-  setDisabledState?(isDisabled: boolean): void {
-    throw new Error('Method not implemented.');
-  }
-
 }
 // Next - remove alpha after 0
 // Next - left and right pos currency code
