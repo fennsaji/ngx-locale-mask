@@ -1,4 +1,15 @@
-<input  type="text" (localMaskChange)="val=$event" localeCurrencyMask [(locale)]="locale" [currencyOptions]="maskOptions"><br>
-<div *ngFor="let locale of localeArr; let i = index">
-    <input type="radio" name="locale" [value]="locale" (change)="changeLocale(locale)" [checked]="i == 0"> {{locale}}<br>
-</div>
+<h2>NgxLocaleMaskDemo</h2>
+
+<article>
+    <input  type="text" (localCurrencyMaskChange)="val=$event" localeCurrencyMask [locale]="locale" [currencyOptions]="maskOptions"><br>
+    <br>
+    <div *ngFor="let locale of localeArr; let i = index">
+        <input type="radio" name="locale" [value]="locale" (change)="changeLocale(locale)" [checked]="i == 0"> {{locale}}<br>
+    </div>
+</article>
+
+
+<footer>
+    <h4>Authors: </h4>
+    <p>Tibin Thomas & Fenn Ignatius Saji</p>
+</footer>

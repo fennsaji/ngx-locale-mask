@@ -21,7 +21,7 @@ export class AppComponent {
   _val;
   set val(val) { this._val = val; console.log(val) };
   get val() { return this._val }
-
+  
   constructor() {
     this.maskOptions = { localeName: 'en-IN', currency: '₹', currencyCode: '$', digitsInfo: '2.1-4' };
     registerLocaleData(this.locale) 
