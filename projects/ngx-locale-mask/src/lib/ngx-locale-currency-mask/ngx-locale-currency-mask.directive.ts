@@ -1,6 +1,6 @@
 import { Directive, Input, forwardRef, HostListener, HostBinding, ElementRef, AfterViewInit, Output, EventEmitter } from '@angular/core';
-import { NgxLocaleMaskService } from './ngx-locale-mask.service';
-import { DateMask, CurrencyOptions, NumberMask, PercentMask } from './ngx-locale-mask.modal';
+import { NgxLocaleMaskService } from '../ngx-locale-mask.service';
+import { CurrencyOptions, NumberMask, PercentMask } from '../ngx-locale-mask.modal';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { registerLocaleData, formatCurrency } from '@angular/common';
 
@@ -39,11 +39,6 @@ export class NgxLocaleCurrencyMaskDirective implements AfterViewInit {
     registerLocaleData(this._ngxLocaleMaskService.locale);
   }
 
-  @Input()
-  public set dateMask(value: DateMask) {
-    this._ngxLocaleMaskService.maskCategoryAndOptions = value;
-    this.activeMask = 'date';
-  }
 
   @Input()
   public set currencyOptions(value: CurrencyOptions) {
