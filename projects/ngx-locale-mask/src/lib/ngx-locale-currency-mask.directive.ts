@@ -57,11 +57,6 @@ export class NgxLocaleCurrencyMaskDirective implements AfterViewInit {
     this.activeMask = 'number';
   }
   
-  @Input()
-  public set percentMask(value: PercentMask) {
-    this._ngxLocaleMaskService.maskCategoryAndOptions = value;
-    this.activeMask = 'percent';
-  }
 
 
   @HostListener('input', ['$event'])

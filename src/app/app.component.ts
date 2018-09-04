@@ -16,6 +16,7 @@ export class AppComponent {
   title = 'ngx-locale-mask-app';
   locale = localeIN;
   maskOptions: CurrencyOptions;
+  percentOptions;
   localeArr = ['en-IN', 'en-DE', 'en-AU'];
 
   _val;
@@ -24,6 +25,7 @@ export class AppComponent {
   
   constructor() {
     this.maskOptions = { localeName: 'en-IN', currency: '₹', currencyCode: '$', digitsInfo: '2.1-4' };
+    this.percentOptions = { localeName: 'en-IN', digitsInfo: '2.1-4'}
     registerLocaleData(this.locale) 
   }
 
